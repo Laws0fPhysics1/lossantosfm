@@ -12,14 +12,14 @@
             justify-content: center;
             height: 100vh;
             background-color: #222;
-            background-image: url('background.jpg'); /* Background image */
+            background-image: url('background.jpg');
             background-size: cover;
             background-position: center;
             color: white;
             font-family: Arial, sans-serif;
         }
         .radio {
-            background: rgba(68, 68, 68, 0.8); /* Slightly transparent background */
+            background: rgba(68, 68, 68, 0.8);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
@@ -37,14 +37,67 @@
         button:hover {
             background-color: #666;
         }
+
+        /* Dial styles */
+        .dial {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: #444;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            transform: rotate(0deg);
+        }
+
+        .dial input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+            border-radius: 50%;
+            background: transparent;
+        }
+
+        .dial input[type="range"]::-webkit-slider-runnable-track {
+            background: transparent;
+        }
+
+        .dial input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .dial input[type="range"]:focus {
+            outline: none;
+        }
+
+        .label {
+            position: absolute;
+            font-size: 16px;
+            color: white;
+            z-index: 10;
+        }
     </style>
 </head>
 <body>
     <div class="radio">
         <h2>Virtual Radio</h2>
-        <label>Station</label>
-        <input type="range" id="station" min="0" max="9" step="1" value="0">
-        <br>
+
+        <div class="dial">
+            <input type="range" id="station" min="0" max="9" step="1" value="0">
+            <span class="label" id="stationLabel">Station 1</span>
+        </div>
+
         <label>Volume</label>
         <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
         <br>
@@ -58,54 +111,32 @@
         const volumeInput = document.getElementById("volume");
         const audio = document.getElementById("audio");
         const playButton = document.getElementById("playButton");
+        const stationLabel = document.getElementById("stationLabel");
 
-const stations = [
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Kdust.mp3", 
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Krose.mp3", 
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Nonstoppop.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song4.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song5.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song6.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song7.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song8.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song9.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
-];
+        const stations = [
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Kdust.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Krose.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song3.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song4.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song5.mp3",
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song6.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song7.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song8.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song9.mp3", 
+            "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song10.mp3"
+        ];
 
-// Function to update station
-function updateStation() {
-    let audioSource;
+        // Function to update station
+        function updateStation() {
+            let audioSource;
 
-    // Handle stations explicitly
-    if (stationInput.value == 0) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Kdust.mp3"; // Station 1
-    } else if (stationInput.value == 1) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Krose.mp3"; // Station 2
-    } else if (stationInput.value == 2) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Nonstoppop.mp3"; // Station 3
-    } else if (stationInput.value == 3) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song4.mp3"; // Station 4
-    } else if (stationInput.value == 4) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song5.mp3"; // Station 5
-    } else if (stationInput.value == 5) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song6.mp3"; // Station 6
-    } else if (stationInput.value == 6) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song7.mp3"; // Station 7
-    } else if (stationInput.value == 7) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song8.mp3"; // Station 8
-    } else if (stationInput.value == 8) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song9.mp3"; // Station 9
-    } else if (stationInput.value == 9) {
-        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song10.mp3"; // Station 10
-    } else {
-        audioSource = stations[stationInput.value]; // For other stations in the array (if added more later)
-    }
+            // Handle stations 0 to 9
+            audioSource = stations[stationInput.value];
+            audio.src = audioSource;
 
-    audio.src = audioSource;
-
-    // Check if the source is valid and play the audio
-    audio.load();
-}
+            // Update the station label
+            stationLabel.textContent = `Station ${parseInt(stationInput.value) + 1}`;
+        }
 
         // Function to update volume
         function updateVolume() {
