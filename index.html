@@ -54,12 +54,28 @@
     </div>
 
     <script>
-       const stationInput = document.getElementById("station");
+      const stationInput = document.getElementById("station");
 const volumeInput = document.getElementById("volume");
 const audio = document.getElementById("audio");
-const playButton = document.getElementById("playButton");
+const powerButton = document.getElementById("playButton");
+const stationLabel = document.createElement("h3"); // Create station display element
+document.querySelector(".radio").appendChild(stationLabel); // Add it below the slider
 
-// List of station URLs
+// Station names for display
+const stationNames = [
+    "91.1 The Low Down",
+    "92.5 Country Classics",
+    "93.7 Non-Stop Pop",
+    "94.9 Rock Radio",
+    "96.3 Chill Vibes",
+    "97.5 EDM Energy",
+    "98.9 Classic Hits",
+    "100.1 Smooth Jazz",
+    "101.3 The Underground",
+    "102.7 The Wave"
+];
+
+// Station URLs
 const stations = [
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Kdust.mp3", 
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Krose.mp3", 
@@ -73,33 +89,36 @@ const stations = [
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
 ];
 
-// Load saved playback positions (if available)
+// Load saved playback positions
 let stationTimes = JSON.parse(localStorage.getItem("stationTimes")) || {};
+let lastStation = localStorage.getItem("currentStation") || "0";
+let isPoweredOn = false; // Track power state
 
 // Function to update station
 function updateStation() {
     let stationIndex = stationInput.value;
     let audioSource = stations[stationIndex];
 
-    // Store current time before switching
+    // Save the current station's playback position
     if (!audio.paused) {
-        stationTimes[localStorage.getItem("currentStation")] = audio.currentTime;
+        stationTimes[lastStation] = audio.currentTime;
     }
-
-    // Save updated playback positions
     localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
 
-    // Set new station
+    // Update station display
+    stationLabel.textContent = stationNames[stationIndex];
+
+    // Set new station and restore playback position
     localStorage.setItem("currentStation", stationIndex);
     audio.src = audioSource;
+    audio.currentTime = stationTimes[stationIndex] || 0;
 
-    // Restore playback position if available
-    if (stationTimes[stationIndex]) {
-        audio.currentTime = stationTimes[stationIndex];
+    // Play immediately if powered on
+    if (isPoweredOn) {
+        audio.play();
     }
 
-    // Load and play
-    audio.load();
+    lastStation = stationIndex;
 }
 
 // Function to update volume
@@ -107,12 +126,17 @@ function updateVolume() {
     audio.volume = volumeInput.value;
 }
 
-// Play button handler
-playButton.addEventListener("click", function () {
-    updateStation();
-    audio.play().catch((error) => {
-        console.error("Error playing audio:", error);
-    });
+// Toggle power (play/pause)
+powerButton.addEventListener("click", function () {
+    if (isPoweredOn) {
+        audio.pause();
+        powerButton.textContent = "Power Up";
+    } else {
+        updateStation();
+        audio.play();
+        powerButton.textContent = "Power Down";
+    }
+    isPoweredOn = !isPoweredOn;
 });
 
 // Save playback time when user switches stations
@@ -125,12 +149,14 @@ audio.addEventListener("pause", function () {
 stationInput.addEventListener("input", updateStation);
 volumeInput.addEventListener("input", updateVolume);
 
-// Set initial station and volume
-if (localStorage.getItem("currentStation")) {
-    stationInput.value = localStorage.getItem("currentStation");
-}
-updateStation();
-updateVolume();
+// Initialize on page load
+window.onload = function () {
+    stationInput.value = lastStation;
+    stationLabel.textContent = stationNames[lastStation];
+    updateStation();
+    updateVolume();
+};
+
     </script>
 </body>
 </html>
