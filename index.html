@@ -57,7 +57,10 @@
         const stationInput = document.getElementById("station");
 const volumeInput = document.getElementById("volume");
 const audio = document.getElementById("audio");
-const playButton = document.getElementById("playButton");
+const powerButton = document.getElementById("playButton");
+
+// Static noise file
+const staticSound = new Audio("https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/static.mp3");
 
 // List of station URLs
 const stations = [
@@ -73,33 +76,39 @@ const stations = [
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
 ];
 
-// Load saved playback positions (if available)
+// Load saved playback times
 let stationTimes = JSON.parse(localStorage.getItem("stationTimes")) || {};
 
-// Function to update station
+// Load last played station & time (if available)
+let lastStation = localStorage.getItem("currentStation") || "0";
+stationInput.value = lastStation;
+
+// Function to update the station while maintaining playback position
 function updateStation() {
-    let stationIndex = stationInput.value;
-    let audioSource = stations[stationIndex];
+    let newStation = stationInput.value;
+    let currentTime = audio.currentTime;
 
-    // Store current time before switching
-    if (!audio.paused) {
-        stationTimes[localStorage.getItem("currentStation")] = audio.currentTime;
-    }
-
-    // Save updated playback positions
+    // Save current station's playback time
+    stationTimes[lastStation] = currentTime;
     localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
 
-    // Set new station
-    localStorage.setItem("currentStation", stationIndex);
-    audio.src = audioSource;
+    // Play static sound effect
+    staticSound.play();
 
-    // Restore playback position if available
-    if (stationTimes[stationIndex]) {
-        audio.currentTime = stationTimes[stationIndex];
-    }
+    // Wait for static to finish before switching
+    staticSound.onended = function () {
+        audio.src = stations[newStation];
+        localStorage.setItem("currentStation", newStation);
 
-    // Load and play
-    audio.load();
+        // Sync time across stations
+        let syncedTime = stationTimes[newStation] || currentTime;
+        audio.currentTime = syncedTime;
+
+        // Start playing immediately
+        audio.play();
+    };
+
+    lastStation = newStation; // Update last played station
 }
 
 // Function to update volume
@@ -107,29 +116,24 @@ function updateVolume() {
     audio.volume = volumeInput.value;
 }
 
-// Play button handler
-playButton.addEventListener("click", function () {
-    updateStation();
-    audio.play().catch((error) => {
-        console.error("Error playing audio:", error);
-    });
+// Toggle power (play/pause)
+powerButton.addEventListener("click", function () {
+    if (audio.paused) {
+        audio.play();
+        powerButton.textContent = "Power Off";
+    } else {
+        audio.pause();
+        powerButton.textContent = "Power On";
+    }
 });
 
-// Save playback time when user switches stations
-audio.addEventListener("pause", function () {
-    stationTimes[localStorage.getItem("currentStation")] = audio.currentTime;
-    localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
-});
-
-// Event listeners for range inputs
+// Event listeners for controls
 stationInput.addEventListener("input", updateStation);
 volumeInput.addEventListener("input", updateVolume);
 
-// Set initial station and volume
-if (localStorage.getItem("currentStation")) {
-    stationInput.value = localStorage.getItem("currentStation");
-}
-updateStation();
+// Set initial audio source
+audio.src = stations[lastStation];
+audio.currentTime = stationTimes[lastStation] || 0;
 updateVolume();
     </script>
 </body>
