@@ -55,65 +55,82 @@
 
     <script>
         const stationInput = document.getElementById("station");
-        const volumeInput = document.getElementById("volume");
-        const audio = document.getElementById("audio");
-        const playButton = document.getElementById("playButton");
+const volumeInput = document.getElementById("volume");
+const audio = document.getElementById("audio");
+const playButton = document.getElementById("playButton");
 
+// List of station URLs
 const stations = [
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Kdust.mp3", 
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Krose.mp3", 
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Nonstoppop.mp3", 
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Rockradio.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Kdust.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Krose.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Nonstoppop.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Rockradio.mp3",
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song5.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song6.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song7.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song8.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song9.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song6.mp3",
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song7.mp3",
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song8.mp3",
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song9.mp3",
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
 ];
 
+// Load saved playback positions (if available)
+let stationTimes = JSON.parse(localStorage.getItem("stationTimes")) || {};
+
 // Function to update station
 function updateStation() {
-    let audioSource;
+    let stationIndex = stationInput.value;
+    let audioSource = stations[stationIndex];
 
-    // Handle stations 0 and 1 (now using full URL)
-    if (stationInput.value == 0) {
-        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Kdust.mp3"; // Station 1
-    } else if (stationInput.value == 1) {
-        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Krose.mp3"; // Station 2
-    } else if (stationInput.value == 2) {
-        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Nonstoppop.mp3"; // Station 3
-        } else if (stationInput.value == 3) {
-        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Rockradio.mp3"; // Station 4
-    } else {
-        audioSource = stations[stationInput.value]; // Other stations (remaining in the array)
+    // Store current time before switching
+    if (!audio.paused) {
+        stationTimes[localStorage.getItem("currentStation")] = audio.currentTime;
     }
 
+    // Save updated playback positions
+    localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
+
+    // Set new station
+    localStorage.setItem("currentStation", stationIndex);
     audio.src = audioSource;
 
-    // Check if the source is valid and play the audio
+    // Restore playback position if available
+    if (stationTimes[stationIndex]) {
+        audio.currentTime = stationTimes[stationIndex];
+    }
+
+    // Load and play
     audio.load();
 }
 
-        // Function to update volume
-        function updateVolume() {
-            audio.volume = volumeInput.value;
-        }
+// Function to update volume
+function updateVolume() {
+    audio.volume = volumeInput.value;
+}
 
-        // Play button handler
-        playButton.addEventListener("click", function () {
-            updateStation();
-            audio.play().catch((error) => {
-                console.error("Error playing audio:", error);
-            });
-        });
+// Play button handler
+playButton.addEventListener("click", function () {
+    updateStation();
+    audio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+    });
+});
 
-        // Event listeners for range inputs
-        stationInput.addEventListener("input", updateStation);
-        volumeInput.addEventListener("input", updateVolume);
+// Save playback time when user switches stations
+audio.addEventListener("pause", function () {
+    stationTimes[localStorage.getItem("currentStation")] = audio.currentTime;
+    localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
+});
 
-        // Set initial audio source
-        updateStation();
+// Event listeners for range inputs
+stationInput.addEventListener("input", updateStation);
+volumeInput.addEventListener("input", updateVolume);
+
+// Set initial station and volume
+if (localStorage.getItem("currentStation")) {
+    stationInput.value = localStorage.getItem("currentStation");
+}
+updateStation();
+updateVolume();
     </script>
 </body>
 </html>
