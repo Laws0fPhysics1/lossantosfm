@@ -27,6 +27,16 @@
         input[type="range"] {
             width: 300px;
         }
+        button {
+            background-color: #444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #666;
+        }
     </style>
 </head>
 <body>
@@ -39,22 +49,26 @@
         <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
         <br>
         <audio id="audio" controls></audio>
+        <br>
+        <button id="playButton">Play Station</button>
     </div>
 
     <script>
         const stationInput = document.getElementById("station");
         const volumeInput = document.getElementById("volume");
         const audio = document.getElementById("audio");
+        const playButton = document.getElementById("playButton");
 
         const stations = [
             "kdust.mp3", "krose.mp3", "song3.mp3", "song4.mp3", "song5.mp3",
             "song6.mp3", "song7.mp3", "song8.mp3", "song9.mp3", "song10.mp3"
         ];
 
+        // Function to update station
         function updateStation() {
             let audioSource;
 
-            // Explicitly handle station 0 and 1
+            // Handle stations 0 and 1
             if (stationInput.value == 0) {
                 audioSource = "kdust.mp3"; // Station 1
             } else if (stationInput.value == 1) {
@@ -67,19 +81,26 @@
 
             // Check if the source is valid and play the audio
             audio.load();
-            audio.play().catch(error => {
-                console.error("Error playing audio:", error);
-            });
         }
 
+        // Function to update volume
         function updateVolume() {
             audio.volume = volumeInput.value;
         }
 
+        // Play button handler
+        playButton.addEventListener("click", function () {
+            updateStation();
+            audio.play().catch((error) => {
+                console.error("Error playing audio:", error);
+            });
+        });
+
+        // Event listeners for range inputs
         stationInput.addEventListener("input", updateStation);
         volumeInput.addEventListener("input", updateVolume);
 
-        // Set the initial audio source when the page loads
+        // Set initial audio source
         updateStation();
     </script>
 </body>
