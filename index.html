@@ -60,7 +60,7 @@
         const playButton = document.getElementById("playButton");
 
 const stations = [
-    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Kdut.mp3", 
+    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Kdust.mp3", 
     "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Krose.mp3", 
     "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Nonstoppop.mp3", 
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song4.mp3", 
@@ -76,13 +76,29 @@ const stations = [
 function updateStation() {
     let audioSource;
 
-    // Handle stations 0 and 1 (now using full URL)
+    // Handle stations explicitly
     if (stationInput.value == 0) {
-        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Kdust.mp3"; // Station 1
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Kdust.mp3"; // Station 1
     } else if (stationInput.value == 1) {
-        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Krose.mp3"; // Station 2
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Krose.mp3"; // Station 2
+    } else if (stationInput.value == 2) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/Nonstoppop.mp3"; // Station 3
+    } else if (stationInput.value == 3) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song4.mp3"; // Station 4
+    } else if (stationInput.value == 4) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song5.mp3"; // Station 5
+    } else if (stationInput.value == 5) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song6.mp3"; // Station 6
+    } else if (stationInput.value == 6) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song7.mp3"; // Station 7
+    } else if (stationInput.value == 7) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song8.mp3"; // Station 8
+    } else if (stationInput.value == 8) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song9.mp3"; // Station 9
+    } else if (stationInput.value == 9) {
+        audioSource = "https://raw.githubusercontent.com/Laws0fPhysics1/lossantosfm/master/song10.mp3"; // Station 10
     } else {
-        audioSource = stations[stationInput.value]; // Other stations (remaining in the array)
+        audioSource = stations[stationInput.value]; // For other stations in the array (if added more later)
     }
 
     audio.src = audioSource;
