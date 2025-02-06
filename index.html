@@ -63,7 +63,7 @@ const stations = [
     "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Kdust.mp3", 
     "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Krose.mp3", 
     "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Nonstoppop.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song4.mp3", 
+    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Rockradio.mp3", 
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song5.mp3",
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song6.mp3", 
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song7.mp3", 
@@ -82,7 +82,9 @@ function updateStation() {
     } else if (stationInput.value == 1) {
         audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Krose.mp3"; // Station 2
     } else if (stationInput.value == 2) {
-        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Nonstoppop.mp3"; // Station 3  
+        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Nonstoppop.mp3"; // Station 3
+        } else if (stationInput.value == 3) {
+        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Rockradio.mp3"; // Station 4
     } else {
         audioSource = stations[stationInput.value]; // Other stations (remaining in the array)
     }
