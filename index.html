@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Radio</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #222;
+            background-image: url('background.jpg'); /* Background image */
+            background-size: cover;
+            background-position: center;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .radio {
+            background: rgba(68, 68, 68, 0.8); /* Slightly transparent background */
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input[type="range"] {
+            width: 300px;
+        }
+        button {
+            background-color: #444;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="radio">
+        <h2>Virtual Radio</h2>
+        <label>Station</label>
+        <input type="range" id="station" min="0" max="9" step="1" value="0">
+        <br>
+        <label>Volume</label>
+        <input type="range" id="volume" min="0" max="1" step="0.1" value="0.5">
+        <br>
+        <audio id="audio" controls></audio>
+        <br>
+        <button id="playButton">Play Station</button>
+    </div>
+
+    <script>
+        const stationInput = document.getElementById("station");
+        const volumeInput = document.getElementById("volume");
+        const audio = document.getElementById("audio");
+        const playButton = document.getElementById("playButton");
+
+const stations = [
+    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Kdust.mp3", 
+    "https://github.com/Laws0fPhysics1/lossantosfm/blob/master/Krose.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song3.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song4.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song5.mp3",
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song6.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song7.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song8.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song9.mp3", 
+    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
+];
+
+// Function to update station
+function updateStation() {
+    let audioSource;
+
+    // Handle stations 0 and 1 (now using full URL)
+    if (stationInput.value == 0) {
+        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Kdust.mp3"; // Station 1
+    } else if (stationInput.value == 1) {
+        audioSource = "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Krose.mp3"; // Station 2
+    } else {
+        audioSource = stations[stationInput.value]; // Other stations (remaining in the array)
+    }
+
+    audio.src = audioSource;
+
+    // Check if the source is valid and play the audio
+    audio.load();
+}
+
+        // Function to update volume
+        function updateVolume() {
+            audio.volume = volumeInput.value;
+        }
+
+        // Play button handler
+        playButton.addEventListener("click", function () {
+            updateStation();
+            audio.play().catch((error) => {
+                console.error("Error playing audio:", error);
+            });
+        });
+
+        // Event listeners for range inputs
+        stationInput.addEventListener("input", updateStation);
+        volumeInput.addEventListener("input", updateVolume);
+
+        // Set initial audio source
+        updateStation();
+    </script>
+</body>
+</html>
