@@ -58,8 +58,18 @@
 const volumeInput = document.getElementById("volume");
 const audio = document.getElementById("audio");
 const powerButton = document.getElementById("playButton");
-const stationLabel = document.createElement("h3"); // Create station display element
-document.querySelector(".radio").appendChild(stationLabel); // Add it below the slider
+const skipForwardButton = document.createElement("button");
+const skipBackwardButton = document.createElement("button");
+const stationLabel = document.createElement("h3");
+
+// Add station name display
+document.querySelector(".radio").appendChild(stationLabel);
+
+// Add skip buttons
+skipForwardButton.textContent = ">> +30s";
+skipBackwardButton.textContent = "<< -30s";
+document.querySelector(".radio").appendChild(skipBackwardButton);
+document.querySelector(".radio").appendChild(skipForwardButton);
 
 // Station names for display
 const stationNames = [
@@ -89,36 +99,39 @@ const stations = [
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
 ];
 
-// Load saved playback positions
-let stationTimes = JSON.parse(localStorage.getItem("stationTimes")) || {};
-let lastStation = localStorage.getItem("currentStation") || "0";
-let isPoweredOn = false; // Track power state
+// Global time tracker (simulates all stations playing at once)
+let globalClock = parseFloat(localStorage.getItem("globalClock")) || 0;
+let lastUpdate = Date.now();
+let isPoweredOn = false;
 
-// Function to update station
+// Function to update the station
 function updateStation() {
     let stationIndex = stationInput.value;
     let audioSource = stations[stationIndex];
 
-    // Save the current station's playback position
-    if (!audio.paused) {
-        stationTimes[lastStation] = audio.currentTime;
-    }
-    localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
+    // Sync global time before switching stations
+    syncGlobalTime();
 
     // Update station display
     stationLabel.textContent = stationNames[stationIndex];
 
-    // Set new station and restore playback position
-    localStorage.setItem("currentStation", stationIndex);
+    // Set new station and apply the global clock
     audio.src = audioSource;
-    audio.currentTime = stationTimes[stationIndex] || 0;
-
+    audio.currentTime = globalClock;
+    
     // Play immediately if powered on
     if (isPoweredOn) {
         audio.play();
     }
+}
 
-    lastStation = stationIndex;
+// Function to sync global time
+function syncGlobalTime() {
+    let now = Date.now();
+    let elapsed = (now - lastUpdate) / 1000; // Convert to seconds
+    globalClock += elapsed;
+    lastUpdate = now;
+    localStorage.setItem("globalClock", globalClock);
 }
 
 // Function to update volume
@@ -139,10 +152,20 @@ powerButton.addEventListener("click", function () {
     isPoweredOn = !isPoweredOn;
 });
 
-// Save playback time when user switches stations
-audio.addEventListener("pause", function () {
-    stationTimes[localStorage.getItem("currentStation")] = audio.currentTime;
-    localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
+// Skip forward 30s
+skipForwardButton.addEventListener("click", function () {
+    syncGlobalTime();
+    globalClock += 30;
+    audio.currentTime = globalClock;
+    localStorage.setItem("globalClock", globalClock);
+});
+
+// Skip backward 30s
+skipBackwardButton.addEventListener("click", function () {
+    syncGlobalTime();
+    globalClock = Math.max(0, globalClock - 30); // Prevent negative time
+    audio.currentTime = globalClock;
+    localStorage.setItem("globalClock", globalClock);
 });
 
 // Event listeners for range inputs
@@ -151,8 +174,9 @@ volumeInput.addEventListener("input", updateVolume);
 
 // Initialize on page load
 window.onload = function () {
-    stationInput.value = lastStation;
-    stationLabel.textContent = stationNames[lastStation];
+    lastUpdate = Date.now();
+    stationInput.value = localStorage.getItem("currentStation") || "0";
+    stationLabel.textContent = stationNames[stationInput.value];
     updateStation();
     updateVolume();
 };
