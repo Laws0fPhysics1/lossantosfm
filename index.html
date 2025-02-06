@@ -54,7 +54,7 @@
     </div>
 
     <script>
-      const stationInput = document.getElementById("station");
+     const stationInput = document.getElementById("station");
 const volumeInput = document.getElementById("volume");
 const audio = document.getElementById("audio");
 const powerButton = document.getElementById("playButton");
@@ -99,8 +99,11 @@ const stations = [
     "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
 ];
 
-// Global time tracker (simulates all stations playing at once)
-let globalClock = parseFloat(localStorage.getItem("globalClock")) || 0;
+// Reset local storage on page load (wipes all saved progress)
+localStorage.clear();
+
+// Global clock (reset to 0 on page load)
+let globalClock = 0;
 let lastUpdate = Date.now();
 let isPoweredOn = false;
 
@@ -131,7 +134,6 @@ function syncGlobalTime() {
     let elapsed = (now - lastUpdate) / 1000; // Convert to seconds
     globalClock += elapsed;
     lastUpdate = now;
-    localStorage.setItem("globalClock", globalClock);
 }
 
 // Function to update volume
@@ -157,7 +159,6 @@ skipForwardButton.addEventListener("click", function () {
     syncGlobalTime();
     globalClock += 30;
     audio.currentTime = globalClock;
-    localStorage.setItem("globalClock", globalClock);
 });
 
 // Skip backward 30s
@@ -165,7 +166,6 @@ skipBackwardButton.addEventListener("click", function () {
     syncGlobalTime();
     globalClock = Math.max(0, globalClock - 30); // Prevent negative time
     audio.currentTime = globalClock;
-    localStorage.setItem("globalClock", globalClock);
 });
 
 // Event listeners for range inputs
@@ -175,8 +175,8 @@ volumeInput.addEventListener("input", updateVolume);
 // Initialize on page load
 window.onload = function () {
     lastUpdate = Date.now();
-    stationInput.value = localStorage.getItem("currentStation") || "0";
-    stationLabel.textContent = stationNames[stationInput.value];
+    stationInput.value = "0"; // Default station
+    stationLabel.textContent = stationNames[0]; // Default station name
     updateStation();
     updateVolume();
 };
