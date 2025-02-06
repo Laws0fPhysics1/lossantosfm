@@ -82,9 +82,10 @@ let stationTimes = JSON.parse(localStorage.getItem("stationTimes")) || {};
 // Load last played station & time (if available)
 let lastStation = localStorage.getItem("currentStation") || "0";
 stationInput.value = lastStation;
+let isPoweredOn = false; // Track if radio is on
 
-// Function to update the station while maintaining playback position
-function updateStation() {
+// Function to start playing a station
+function playStation() {
     let newStation = stationInput.value;
     let currentTime = audio.currentTime;
 
@@ -92,10 +93,9 @@ function updateStation() {
     stationTimes[lastStation] = currentTime;
     localStorage.setItem("stationTimes", JSON.stringify(stationTimes));
 
-    // Play static sound effect
+    // Play static effect
     staticSound.play();
 
-    // Wait for static to finish before switching
     staticSound.onended = function () {
         audio.src = stations[newStation];
         localStorage.setItem("currentStation", newStation);
@@ -104,7 +104,7 @@ function updateStation() {
         let syncedTime = stationTimes[newStation] || currentTime;
         audio.currentTime = syncedTime;
 
-        // Start playing immediately
+        // Play automatically
         audio.play();
     };
 
@@ -118,23 +118,33 @@ function updateVolume() {
 
 // Toggle power (play/pause)
 powerButton.addEventListener("click", function () {
-    if (audio.paused) {
-        audio.play();
-        powerButton.textContent = "Power Off";
-    } else {
+    if (isPoweredOn) {
         audio.pause();
-        powerButton.textContent = "Power On";
+        powerButton.textContent = "Power Up";
+    } else {
+        playStation();
+        powerButton.textContent = "Power Down";
+    }
+    isPoweredOn = !isPoweredOn;
+});
+
+// Switch stations
+stationInput.addEventListener("input", function () {
+    if (isPoweredOn) {
+        playStation();
     }
 });
 
-// Event listeners for controls
-stationInput.addEventListener("input", updateStation);
+// Update volume when changed
 volumeInput.addEventListener("input", updateVolume);
 
-// Set initial audio source
-audio.src = stations[lastStation];
-audio.currentTime = stationTimes[lastStation] || 0;
-updateVolume();
+// Auto-start the last station when the page loads (if autoplay is allowed)
+window.onload = function () {
+    powerButton.textContent = "Power Up";
+    audio.src = stations[lastStation];
+    audio.currentTime = stationTimes[lastStation] || 0;
+    updateVolume();
+};
     </script>
 </body>
 </html>
