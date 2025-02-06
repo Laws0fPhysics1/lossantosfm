@@ -52,11 +52,13 @@
         <br>
         <button id="playButton">Play Station</button>
     </div>
+<audio id="staticAudio" src="Static.mp3"></audio> <!-- Static sound effect -->
 
-    <script>
-     const stationInput = document.getElementById("station");
+<script>
+const stationInput = document.getElementById("station");
 const volumeInput = document.getElementById("volume");
 const audio = document.getElementById("audio");
+const staticAudio = document.getElementById("staticAudio");
 const powerButton = document.getElementById("playButton");
 const skipForwardButton = document.createElement("button");
 const skipBackwardButton = document.createElement("button");
@@ -87,16 +89,16 @@ const stationNames = [
 
 // Station URLs
 const stations = [
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Kdust.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Krose.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Nonstoppop.mp3", 
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Rockradio.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/The Lab.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/blonded.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/Flash.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/WCTR.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song9.mp3",
-    "https://media.githubusercontent.com/media/Laws0fPhysics1/lossantosfm/refs/heads/master/song10.mp3"
+    "Kdust.mp3", 
+    "Krose.mp3", 
+    "Nonstoppop.mp3", 
+    "Rockradio.mp3",
+    "The Lab.mp3",
+    "blonded.mp3",
+    "Flash.mp3",
+    "WCTR.mp3",
+    "song9.mp3",
+    "song10.mp3"
 ];
 
 // Reset local storage on page load (wipes all saved progress)
@@ -107,7 +109,7 @@ let globalClock = 0;
 let lastUpdate = Date.now();
 let isPoweredOn = false;
 
-// Function to update the station
+// Function to update the station with static effect
 function updateStation() {
     let stationIndex = stationInput.value;
     let audioSource = stations[stationIndex];
@@ -115,17 +117,22 @@ function updateStation() {
     // Sync global time before switching stations
     syncGlobalTime();
 
-    // Update station display
-    stationLabel.textContent = stationNames[stationIndex];
+    // Play static effect
+    staticAudio.play();
 
-    // Set new station and apply the global clock
-    audio.src = audioSource;
-    audio.currentTime = globalClock;
-    
-    // Play immediately if powered on
-    if (isPoweredOn) {
-        audio.play();
-    }
+    // Pause main audio while static plays
+    audio.pause();
+
+    // After static sound plays, switch to the new station
+    setTimeout(() => {
+        stationLabel.textContent = stationNames[stationIndex];
+        audio.src = audioSource;
+        audio.currentTime = globalClock;
+
+        if (isPoweredOn) {
+            audio.play();
+        }
+    }, 800); // 800ms static duration
 }
 
 // Function to sync global time
@@ -180,7 +187,7 @@ window.onload = function () {
     updateStation();
     updateVolume();
 };
+</script>
 
-    </script>
 </body>
 </html>
