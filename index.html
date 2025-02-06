@@ -49,10 +49,17 @@
         ];
 
         function updateStation() {
-            audio.src = stations[stationInput.value];
+            // Explicitly set station 1 and 2 to play "kdust.mp3" and "krose.mp3"
+            if (stationInput.value == 0) {
+                audio.src = "kdust.mp3"; // Station 1
+            } else if (stationInput.value == 1) {
+                audio.src = "krose.mp3"; // Station 2
+            } else {
+                audio.src = stations[stationInput.value]; // Other stations
+            }
             audio.play();
         }
-        
+
         function updateVolume() {
             audio.volume = volumeInput.value;
         }
